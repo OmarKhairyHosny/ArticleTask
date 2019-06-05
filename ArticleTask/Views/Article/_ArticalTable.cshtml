@@ -1,0 +1,93 @@
+﻿@model List<Category>
+@{
+    foreach (var cat in Model)
+    {
+        foreach (var article in cat.Article)
+        {
+            <tr>
+                <th>@article.Name</th>
+                <td><a style="cursor:pointer; color:dodgerblue" id="@article.Id" data-toggle="modal" data-target="#Comments" onclick="GetArticalComment(event.target.id)">Comments</a></td>
+                <td>@article.Category.Name</td>
+            </tr>
+        }
+    }
+}
+<div class="modal fade" id="Comments" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Comments</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body col-12">
+                <div class="row">
+
+                    <div id="ArticleComments">
+
+
+                    </div>
+                </div>
+                <div class="row" style="margin-top:20px">
+                    <textarea style="width:400px; height:100px; max-width:1000px;  margin-left:5%"  id="CommentDescription"></textarea>
+                </div>
+            </div> 
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="AddComment">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script>
+    var articleId;
+    var GetArticalComment = function (id) {
+        $("#CommentDescription").val(""); 
+         articleId = id;
+         $.ajax({
+                url: '@Url.Action("GetArticleComments", "Article")',
+                data: { 
+                    ArticleId: articleId
+                },
+                type: 'POST',
+                success: function (dat) {
+                    $("#ArticleComments").html(dat);
+                    console.log(dat);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+        });
+    };
+    $("#AddComment").click(function () {
+        var description = $("#CommentDescription").val(); 
+        if (description == "") {
+            alert("Please Enter Your Comment!")
+            return;
+        }
+        var userName;
+        if ("@User.Identity.IsAuthenticated"=="True")
+            userName = "@User.Identity.Name";
+        else
+            userName = "anonymous";
+         $.ajax({
+                url: '@Url.Action("AddComment", "Article")',
+                data: { 
+                    ArticleId: articleId,
+                    Description: description,
+                    UserName: userName
+                },
+                type: 'POST',
+             success: function (dat) {
+                 $("#ArticleComments").html(dat);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+        });
+
+    });
+</script> 

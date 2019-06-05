@@ -1,0 +1,153 @@
+﻿@using Microsoft.AspNet.Identity
+@model List<Category>
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<div class="row" style="position:relative; top:50px">
+
+    <div class="col-12">
+        @{
+            if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
+            {
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addArticle">
+                    Add article
+                </button>
+
+            }
+        }
+
+        <table class="table table-striped ">
+            <thead>
+                <tr>
+                    <th class="col-6">Atricle</th>
+                    <th class="col-6 ">
+                        <div class="dropdown">
+                            <button class="btn btn-link dropdown-toggle status-button" type="button"
+                                    id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true"
+                                    aria-expanded="false">
+                                Category
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+
+                                <button class="dropdown-item" id="0" onclick="Fillter(event)" type="button">All</button>
+                                @{
+                                    foreach (var cat in Model)
+                                    {
+                                        <button class="dropdown-item" id="@cat.Id" onclick="Fillter(event)" type="button">@cat.Name</button>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody id="Articletable">
+
+                @Html.Partial("_ArticalTable", Model)
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal fade" id="addArticle" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Atricle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body col-12">
+                <div class="row">
+                    <form style="margin-left:20%">
+                        Article Name: <input id="ArticleName" type="text"><br>
+                        Category: <div class="btn-group" style="margin-left: 20px; margin-top: 10px; height: 30px;">
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false" id="Mainbtn">
+                                Select Category
+                            </button>
+                            <div class="dropdown-menu">
+
+                                @{
+                                    foreach (var cat in Model)
+                                    {
+                                        <a class="dropdown-item" id="@cat.Id" onclick="ChangeSelectedCategory(event)" href="#">@cat.Name</a>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="AddNewArticlebtn">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        var SelectedCategoryId
+    var ChangeSelectedCategory = function (event) { 
+        SelectedCategoryId = event.target.id;
+        $("#Mainbtn").text(event.target.innerText)
+    };
+        $("#AddNewArticlebtn").click(function () {
+            if (SelectedCategoryId == null) {
+                alert("Please Choose Category!")
+                return;
+            };
+            var ArticleName = $("#ArticleName").val();
+            $.ajax({
+                url: '@Url.Action("AddArticle", "Article")',
+                data: {
+                    Name: ArticleName,
+                    CategoryId: SelectedCategoryId
+                },
+                type: 'POST',
+                success: function (dat) {
+                    $("#Articletable").html(dat);
+                    console.log(dat);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+        });
+    });
+
+    var Fillter = function (event) {
+        var categoryId = event.target.id;
+         $.ajax({
+                url: '@Url.Action("FillterArticles", "Article")',
+                data: {
+                    CategoryId: categoryId
+                },
+                type: 'POST',
+                success: function (dat) {
+                    $("#Articletable").html(dat);
+                    console.log(dat);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+        });
+    };
+    </script>
+}
+
+
+
+
+
+
+

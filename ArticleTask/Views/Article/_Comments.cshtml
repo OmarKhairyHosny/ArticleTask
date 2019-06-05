@@ -1,0 +1,11 @@
+﻿@using Microsoft.AspNet.Identity
+@model List<Comment>
+@{
+    foreach (var comment in Model)
+    {
+        <fieldset style="padding: .35em .625em .75em;  margin: 0 2px; border: 1px solid #c0c0c0; font-size:14px">
+            <legend style="color:#ac6d6d;font-size:16px; margin-bottom:2px">By: @comment.UserName</legend>
+            <span>@comment.Description</span>
+        </fieldset>
+    }
+}
