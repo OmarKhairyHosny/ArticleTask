@@ -1,0 +1,6 @@
+You can use the app as following:
+
+1- Build and Run the solution "ArticleTask"
+2- You can see all published articles, and comment and filter articles based on categories as an anonymous user
+3- You can login or register as user
+4- You can add a new article if you use admin credential as (UserName:"admin@yackeensolutions.com"  Password:"A!23456$a")
